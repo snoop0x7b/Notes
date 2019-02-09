@@ -1,4 +1,4 @@
-package com.zach.notes;
+package com.zach.notes.activities;
 
 import android.app.AlertDialog;
 import android.content.ContentValues;
@@ -19,6 +19,7 @@ import android.support.v4.widget.CursorAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
 
+import com.zach.notes.R;
 import com.zach.notes.controller.NoteCursorAdapter;
 import com.zach.notes.model.DBOpenHelper;
 import com.zach.notes.model.NotesProvider;
