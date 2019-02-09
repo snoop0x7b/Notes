@@ -6,7 +6,6 @@
     tools:context=".activities.EditActivity">
 
     <EditText
-        android:inputType="text"
         android:id="@+id/editText"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
