@@ -20,7 +20,7 @@ public class NotesProvider extends ContentProvider {
     private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     public static final String CONTENT_ITEM_TYPE = "Note";
 
-    protected SQLiteDatabase database;
+    private SQLiteDatabase database;
     static {
         uriMatcher.addURI(AUTHORITY, BASE_PATH, NOTES);
         uriMatcher.addURI(AUTHORITY, BASE_PATH+"/#", NOTES_ID); // Particular note

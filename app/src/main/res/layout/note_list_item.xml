@@ -8,6 +8,7 @@
         android:id="@+id/imageDocIcon"
         android:layout_width="36dp"
         android:layout_height="36dp"
+        android:contentDescription="@string/note_edit_icon"
         android:src="@drawable/ic_notebook_black_36dp" />
     <TextView
         android:id="@+id/tvNote"

@@ -22,7 +22,6 @@ import android.widget.Toast;
 
 import com.zach.notes.R;
 import com.zach.notes.controller.NoteCursorAdapter;
-import com.zach.notes.model.DBOpenHelper;
 import com.zach.notes.model.NotesProvider;
 
 
@@ -36,13 +35,8 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
-
-        String[] from = {DBOpenHelper.NOTE_TEXT};
-        int[] to = { R.id.tvNote };
-
         cursorAdapter = new NoteCursorAdapter(this, null, 0);
-        ListView list = (ListView) findViewById( R.id.android_list);
+        ListView list = findViewById( R.id.android_list);
         list.setAdapter(cursorAdapter);
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -122,7 +116,7 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     @Override
-    public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+    public void onLoadFinished(@NonNull Loader<Cursor> loader, Cursor data) {
         cursorAdapter.swapCursor(data);
     }
 

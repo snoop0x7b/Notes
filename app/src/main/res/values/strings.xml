@@ -1,9 +1,12 @@
 <resources>
     <string name="app_name">Notes</string>
-    <string name="create_sample_data">Create Sample Data</string>
     <string name="delete_sample_data">Delete All Data</string>
     <string name="all_deleted">All Notes Deleted</string>
     <string name="are_you_sure">Are you sure? All Notes Will Be Deleted</string>
     <string name="new_note">New Note</string>
     <string name="edit_note">Edit Note</string>
+    <string name="note_updated">Note successfully updated!</string>
+    <string name="note_deleted">Note deleted</string>
+    <string name="note_edit_icon">Note edit icon</string>
+    <string name="enter_note_text">Enter your note text</string>
 </resources>

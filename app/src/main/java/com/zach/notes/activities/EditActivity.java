@@ -28,24 +28,27 @@ public class EditActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_edit);
         // Hook up my editorText
-        editorText = (EditText) findViewById(R.id.editText);
+        editorText = findViewById(R.id.editText);
 
         // Pass back the data
         Intent intent = getIntent();
         Uri uri = intent.getParcelableExtra(NotesProvider.CONTENT_ITEM_TYPE);
-        if (uri == null) {
-            action = Intent.ACTION_INSERT;
-            setTitle(R.string.new_note); // This is a new note
-        } else {
+        // Default behavior is new note
+        action = Intent.ACTION_INSERT;
+        setTitle(R.string.new_note);
+        if (uri != null) {
            // Retrieve the note, set the text.
-            action = Intent.ACTION_EDIT;
-            setTitle(R.string.edit_note);
-            noteFilter = DBOpenHelper.NOTE_ID + "=" + uri.getLastPathSegment();
             Cursor noteCursor = getContentResolver().query(uri, DBOpenHelper.ALL_COLUMNS, noteFilter, null, null, null);
-            noteCursor.moveToFirst();
-            oldText = noteCursor.getString(noteCursor.getColumnIndex(DBOpenHelper.NOTE_TEXT));
-            editorText.setText(oldText);
-            editorText.requestFocus(); // Move to end and focus
+            if (noteCursor != null) {
+                action = Intent.ACTION_EDIT;
+                setTitle(R.string.edit_note);
+                noteFilter = DBOpenHelper.NOTE_ID + "=" + uri.getLastPathSegment();
+                noteCursor.moveToFirst();
+                oldText = noteCursor.getString(noteCursor.getColumnIndex(DBOpenHelper.NOTE_TEXT));
+                editorText.setText(oldText);
+                editorText.requestFocus(); // Move to end and focus
+                noteCursor.close();
+            } // It's improbable that this is null. But defensive coding is a best practice
         }
     }
 
@@ -79,18 +82,18 @@ public class EditActivity extends AppCompatActivity {
         ContentValues values = new ContentValues();
         values.put(DBOpenHelper.NOTE_TEXT, newText);
         getContentResolver().update(NotesProvider.CONTENT_URI, values, this.noteFilter, null );
-        Toast.makeText(this,getString(R.string.note_updated), Toast.LENGTH_SHORT);
+        Toast.makeText(this,getString(R.string.note_updated), Toast.LENGTH_SHORT).show();
         setResult(RESULT_OK);
     }
 
     private void deleteNote() {
         getContentResolver().delete(NotesProvider.CONTENT_URI, this.noteFilter, null);
-        Toast.makeText(this, getString(R.string.note_deleted), Toast.LENGTH_SHORT);
+        Toast.makeText(this, getString(R.string.note_deleted), Toast.LENGTH_SHORT).show();
         setResult(RESULT_OK);
     }
 
     private void insertNote(String newText) {
-        /**
+        /*
          * Wrapper for insert to take a string and just do the insert
          * @param noteValue
          * @return returns the URI for the new note
@@ -99,8 +102,13 @@ public class EditActivity extends AppCompatActivity {
          values.put(DBOpenHelper.NOTE_TEXT, newText);
          Uri result = getContentResolver().insert(NotesProvider.CONTENT_URI,
                   values);
-         Log.d("EditActivity", "Inserted Note "  + result.getLastPathSegment());
-         setResult(RESULT_OK);
+         if (result != null) {
+             Log.d("EditActivity", "Inserted Note " + result.getLastPathSegment());
+             setResult(RESULT_OK);
+         } else {
+             Log.d("EditActivity", "An error occurred inserting a note!");
+             setResult(100); // Error
+         }
     }
 
     @Override
