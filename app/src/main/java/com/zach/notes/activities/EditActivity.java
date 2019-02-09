@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.MenuItem;
 import android.widget.EditText;
+import android.widget.Toast;
 
 import com.zach.notes.R;
 import com.zach.notes.model.DBOpenHelper;
@@ -78,11 +79,13 @@ public class EditActivity extends AppCompatActivity {
         ContentValues values = new ContentValues();
         values.put(DBOpenHelper.NOTE_TEXT, newText);
         getContentResolver().update(NotesProvider.CONTENT_URI, values, this.noteFilter, null );
+        Toast.makeText(this,getString(R.string.note_updated), Toast.LENGTH_SHORT);
         setResult(RESULT_OK);
     }
 
     private void deleteNote() {
         getContentResolver().delete(NotesProvider.CONTENT_URI, this.noteFilter, null);
+        Toast.makeText(this, getString(R.string.note_deleted), Toast.LENGTH_SHORT);
         setResult(RESULT_OK);
     }
 
