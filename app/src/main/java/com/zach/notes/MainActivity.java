@@ -15,11 +15,11 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.CursorAdapter;
+import android.support.v4.widget.CursorAdapter;
 import android.widget.ListView;
-import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
+import com.zach.notes.controller.NoteCursorAdapter;
 import com.zach.notes.model.DBOpenHelper;
 import com.zach.notes.model.NotesProvider;
 
@@ -38,9 +38,7 @@ public class MainActivity extends AppCompatActivity implements
         String[] from = {DBOpenHelper.NOTE_TEXT};
         int[] to = { R.id.tvNote };
 
-         cursorAdapter = new SimpleCursorAdapter(this,
-                R.layout.note_list_item, null, from,
-                to, 0);
+        cursorAdapter = new NoteCursorAdapter(this, null, 0);
         ListView list = (ListView) findViewById( R.id.android_list);
         list.setAdapter(cursorAdapter);
         getSupportLoaderManager().initLoader(0, null, this);
@@ -110,8 +108,11 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     private void createNotes() {
-        for(int i = 0; i < 10; i++) {
-            createNote("Aasdfasdf asdf asdf adsf blah blah");
+        for(int i = 0; i < 5; i++) {
+            createNote("Aasdfasdf asdf asdf adsf blah blah " + i);
+        }
+        for(int i = 0; i < 5; i++) {
+            createNote("Aasdfasdf asdf asdf \n adsf blah blah" + i);
         }
         restartLoader();
     }
