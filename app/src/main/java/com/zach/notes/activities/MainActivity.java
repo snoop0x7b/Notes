@@ -2,21 +2,21 @@ package com.zach.notes.activities;
 
 import android.app.AlertDialog;
 import android.content.ContentValues;
-import android.content.Intent;
-import android.support.v4.content.CursorLoader;
 import android.content.DialogInterface;
-import android.support.v4.content.Loader;
+import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
+import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
-import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
+import android.support.v4.content.CursorLoader;
+import android.support.v4.content.Loader;
+import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.support.v4.widget.CursorAdapter;
 import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
@@ -48,14 +48,7 @@ public class MainActivity extends AppCompatActivity implements
         getSupportLoaderManager().initLoader(0, null, this);
     }
 
-    private Uri createNote(String noteValue) {
-        ContentValues values = new ContentValues();
-        values.put(DBOpenHelper.NOTE_TEXT, noteValue);
-        Uri result = getContentResolver().insert(NotesProvider.CONTENT_URI,
-                values);
-        Log.d("MainActivity", "Inserted Note "  + result.getLastPathSegment());
-        return result;
-    }
+
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -73,9 +66,6 @@ public class MainActivity extends AppCompatActivity implements
 
         //noinspection SimplifiableIfStatement
         switch(id) {
-            case R.id.action_create_data:
-                createNotes();
-                break;
             case R.id.action_delete_data:
                 deleteNotesCmd();
                 break;
@@ -106,18 +96,21 @@ public class MainActivity extends AppCompatActivity implements
                 .show();
     }
 
+    /**
+     * Wrapper for insert to take a string and just do the insert
+     * @param noteValue
+     * @return returns the URI for the new note
+     */
+    public Uri createNote(String noteValue) {
+        ContentValues values = new ContentValues();
+        values.put(DBOpenHelper.NOTE_TEXT, noteValue);
+        Uri result = getContentResolver().insert(NotesProvider.CONTENT_URI,
+                values);
+        Log.d("ContentProvider", "Inserted Note "  + result.getLastPathSegment());
+        return result;
+    }
     private void deleteAllNotes() {
         getContentResolver().delete(NotesProvider.CONTENT_URI, null,null);
-        restartLoader();
-    }
-
-    private void createNotes() {
-        for(int i = 0; i < 5; i++) {
-            createNote("Aasdfasdf asdf asdf adsf blah blah " + i);
-        }
-        for(int i = 0; i < 5; i++) {
-            createNote("Aasdfasdf asdf asdf \n adsf blah blah" + i);
-        }
         restartLoader();
     }
 
@@ -145,5 +138,12 @@ public class MainActivity extends AppCompatActivity implements
     public void openEditorNewNote(View view) {
         Intent intent = new Intent(this, EditActivity.class);
         startActivityForResult(intent, EDITOR_REQUEST_CODE);
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (requestCode == EDITOR_REQUEST_CODE && resultCode == RESULT_OK) {
+            restartLoader(); // Refresh data
+        }
     }
 }

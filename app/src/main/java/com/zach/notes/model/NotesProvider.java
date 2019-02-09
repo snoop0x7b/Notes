@@ -18,6 +18,7 @@ public class NotesProvider extends ContentProvider {
     private static final int NOTES_ID = 2;
 
     private static final UriMatcher uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
+    public static final String CONTENT_ITEM_TYPE = "Note";
 
     protected SQLiteDatabase database;
     static {
@@ -58,4 +59,6 @@ public class NotesProvider extends ContentProvider {
     public int update( Uri uri,  ContentValues values,  String selection,  String[] selectionArgs) {
         return database.update(DBOpenHelper.TABLE_NOTES, values, selection, selectionArgs);
     }
+
+
 }
