@@ -15,7 +15,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <Button
+    <android.support.design.widget.FloatingActionButton
         android:id="@+id/new_note_button"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -23,6 +23,7 @@
         android:layout_alignParentRight="true"
         android:layout_alignParentEnd="true"
         android:onClick="openEditorNewNote"
-        android:text="@string/new_note" />
+        android:src="@drawable/ic_notebook_white_48dp"
+        app:backgroundTint="@color/design_default_color_primary_dark" />
 
 </RelativeLayout>
