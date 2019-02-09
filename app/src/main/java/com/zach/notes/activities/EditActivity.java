@@ -6,7 +6,6 @@ import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -103,10 +102,8 @@ public class EditActivity extends AppCompatActivity {
          Uri result = getContentResolver().insert(NotesProvider.CONTENT_URI,
                   values);
          if (result != null) {
-             Log.d("EditActivity", "Inserted Note " + result.getLastPathSegment());
              setResult(RESULT_OK);
          } else {
-             Log.d("EditActivity", "An error occurred inserting a note!");
              setResult(100); // Error
          }
     }
