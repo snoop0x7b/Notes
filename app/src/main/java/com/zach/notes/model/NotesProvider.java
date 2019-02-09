@@ -33,8 +33,25 @@ public class NotesProvider extends ContentProvider {
         return true;
     }
 
-    @Override
+    /**
+     * Perform a note query
+     * @param uri - Note URI
+     * @param projection
+     * @param selection
+     * @param selectionArgs
+     * @param sortOrder
+     * @return Returns a cursor for the query result
+     */
     public Cursor query( Uri uri,  String[] projection,  String selection,  String[] selectionArgs,  String sortOrder) {
+        /* TODO: I'm curious if this is the correct way to do this vs. using the selection parameter directly.
+         * It may be better to simply pass in NOTE_ID = ... instead of a URI. It makes for a more structured.
+         * query with less concatenation to build a URI.
+         */
+
+        if (uriMatcher.match(uri) == NOTES_ID) {
+            // If the note URI has a note ID
+            selection = DBOpenHelper.NOTE_ID + "=" + uri.getLastPathSegment(); // Last path is the ID.
+        }
         return database.query(DBOpenHelper.TABLE_NOTES, DBOpenHelper.ALL_COLUMNS, selection, null,null,null,
         DBOpenHelper.NOTE_CREATED +" DESC");
     }

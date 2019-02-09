@@ -1,7 +1,6 @@
 package com.zach.notes.activities;
 
 import android.app.AlertDialog;
-import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.database.Cursor;
@@ -14,10 +13,10 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v4.widget.CursorAdapter;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -45,6 +44,16 @@ public class MainActivity extends AppCompatActivity implements
         cursorAdapter = new NoteCursorAdapter(this, null, 0);
         ListView list = (ListView) findViewById( R.id.android_list);
         list.setAdapter(cursorAdapter);
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Intent intent = new Intent(MainActivity.this,
+                        EditActivity.class);
+                Uri uri = Uri.parse(NotesProvider.CONTENT_URI+"/"+id);
+                intent.putExtra(NotesProvider.CONTENT_ITEM_TYPE, uri);
+                startActivityForResult(intent, EDITOR_REQUEST_CODE);
+            }
+        });
         getSupportLoaderManager().initLoader(0, null, this);
     }
 
@@ -96,19 +105,6 @@ public class MainActivity extends AppCompatActivity implements
                 .show();
     }
 
-    /**
-     * Wrapper for insert to take a string and just do the insert
-     * @param noteValue
-     * @return returns the URI for the new note
-     */
-    public Uri createNote(String noteValue) {
-        ContentValues values = new ContentValues();
-        values.put(DBOpenHelper.NOTE_TEXT, noteValue);
-        Uri result = getContentResolver().insert(NotesProvider.CONTENT_URI,
-                values);
-        Log.d("ContentProvider", "Inserted Note "  + result.getLastPathSegment());
-        return result;
-    }
     private void deleteAllNotes() {
         getContentResolver().delete(NotesProvider.CONTENT_URI, null,null);
         restartLoader();
@@ -142,6 +138,7 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        // If everything looks good and we're sure we came back from the edit activity then we can refresh the data.
         if (requestCode == EDITOR_REQUEST_CODE && resultCode == RESULT_OK) {
             restartLoader(); // Refresh data
         }
