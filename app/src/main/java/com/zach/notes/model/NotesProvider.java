@@ -2,6 +2,7 @@ package com.zach.notes.model;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
@@ -28,8 +29,6 @@ public class NotesProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        DBOpenHelper dbHelper = new DBOpenHelper(getContext());
-        database = dbHelper.getWritableDatabase();
         return true;
     }
 
@@ -43,17 +42,20 @@ public class NotesProvider extends ContentProvider {
      * @return Returns a cursor for the query result
      */
     public Cursor query( Uri uri,  String[] projection,  String selection,  String[] selectionArgs,  String sortOrder) {
-        /* TODO: I'm curious if this is the correct way to do this vs. using the selection parameter directly.
-         * It may be better to simply pass in NOTE_ID = ... instead of a URI. It makes for a more structured.
-         * query with less concatenation to build a URI.
-         */
 
+        final Context context = getContext();
+        if (context == null) {
+            // An error has occurred.
+            throw new IllegalStateException("No context found");
+        }
+        NoteDao noteDao = NoteDatabase.getInstance(context).noteDao();
         if (uriMatcher.match(uri) == NOTES_ID) {
             // If the note URI has a note ID
-            selection = DBOpenHelper.NOTE_ID + "=" + uri.getLastPathSegment(); // Last path is the ID.
+             int noteId = Integer.parseInt(uri.getLastPathSegment()); // Last path is the ID.
+             return noteDao.findById(noteId);
+        } else {
+            return noteDao.getNotes();
         }
-        return database.query(DBOpenHelper.TABLE_NOTES, DBOpenHelper.ALL_COLUMNS, selection, null,null,null,
-        DBOpenHelper.NOTE_CREATED +" DESC");
     }
 
     @Override
@@ -63,18 +65,49 @@ public class NotesProvider extends ContentProvider {
 
     @Override
     public Uri insert( Uri uri,  ContentValues values) {
-        long id = database.insert(DBOpenHelper.TABLE_NOTES, null, values);
+        final Context context = getContext();
+        if (context == null) {
+            throw new IllegalStateException("No context found");
+        }
+        final long id = NoteDatabase.getInstance(context).noteDao()
+                .insert(Note.fromContentValues(values));
         return Uri.parse(BASE_PATH+"/"+id);
     }
 
     @Override
     public int delete( Uri uri,  String selection,  String[] selectionArgs) {
-        return database.delete(DBOpenHelper.TABLE_NOTES, selection, selectionArgs);
+        final Context context = getContext();
+        if (context == null) {
+            throw new IllegalStateException("No context found");
+        }
+        if (uriMatcher.match(uri) == NOTES_ID) {
+            // If the note URI has a note ID
+            int noteId = Integer.parseInt(uri.getLastPathSegment()); // Last path is the ID.
+            return NoteDatabase.getInstance(context).noteDao().deleteById(noteId);
+        } else if (uriMatcher.match(uri) == NOTES) {
+            return NoteDatabase.getInstance(context).noteDao().deleteAll();
+        }
+        return 0;
     }
 
     @Override
     public int update( Uri uri,  ContentValues values,  String selection,  String[] selectionArgs) {
-        return database.update(DBOpenHelper.TABLE_NOTES, values, selection, selectionArgs);
+        switch(uriMatcher.match(uri)) {
+            case NOTES_ID:
+                final Context context = getContext();
+                if (context == null) {
+                    throw new IllegalStateException("Context is null");
+                }
+                final Note note = Note.fromContentValues(values);
+                long noteId = Long.parseLong(uri.getLastPathSegment());
+                note.setId(noteId);
+                return NoteDatabase.getInstance(context).noteDao()
+                        .update(note);
+            default:
+            case NOTES:
+                throw new IllegalArgumentException("Invalid URI can't update without an ID " + uri);
+
+        }
     }
 
 

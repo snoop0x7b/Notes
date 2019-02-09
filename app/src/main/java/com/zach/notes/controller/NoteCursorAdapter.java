@@ -9,7 +9,7 @@ import android.support.v4.widget.CursorAdapter;
 import android.widget.TextView;
 
 import com.zach.notes.R;
-import com.zach.notes.model.DBOpenHelper;
+import com.zach.notes.model.Note;
 
 public class NoteCursorAdapter extends CursorAdapter {
 
@@ -45,7 +45,7 @@ public class NoteCursorAdapter extends CursorAdapter {
     @Override
     public void bindView(View view, Context context, Cursor cursor) {
         String noteText =cursor.getString(
-                cursor.getColumnIndex(DBOpenHelper.NOTE_TEXT)
+                cursor.getColumnIndex(Note.NOTE_TEXT)
         );
 
         int pos = noteText.indexOf("\n"); // Returns -1 if not found, something else if found.

@@ -11,7 +11,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.zach.notes.R;
-import com.zach.notes.model.DBOpenHelper;
+import com.zach.notes.model.Note;
 import com.zach.notes.model.NotesProvider;
 
 public class EditActivity extends AppCompatActivity {
@@ -21,6 +21,7 @@ public class EditActivity extends AppCompatActivity {
     private EditText editorText;
     private String noteFilter;
     private String oldText;
+    private Long noteId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -37,13 +38,14 @@ public class EditActivity extends AppCompatActivity {
         setTitle(R.string.new_note);
         if (uri != null) {
            // Retrieve the note, set the text.
-            Cursor noteCursor = getContentResolver().query(uri, DBOpenHelper.ALL_COLUMNS, noteFilter, null, null, null);
+            Cursor noteCursor = getContentResolver().query(uri, Note.ALL_COLUMNS, noteFilter, null, null, null);
             if (noteCursor != null) {
                 action = Intent.ACTION_EDIT;
                 setTitle(R.string.edit_note);
-                noteFilter = DBOpenHelper.NOTE_ID + "=" + uri.getLastPathSegment();
+                noteFilter = Note.NOTE_ID + "=" + uri.getLastPathSegment();
+                noteId = Long.parseLong(uri.getLastPathSegment());
                 noteCursor.moveToFirst();
-                oldText = noteCursor.getString(noteCursor.getColumnIndex(DBOpenHelper.NOTE_TEXT));
+                oldText = noteCursor.getString(noteCursor.getColumnIndex(Note.NOTE_TEXT));
                 editorText.setText(oldText);
                 editorText.requestFocus(); // Move to end and focus
                 noteCursor.close();
@@ -79,14 +81,16 @@ public class EditActivity extends AppCompatActivity {
 
     private void updateNote(String newText) {
         ContentValues values = new ContentValues();
-        values.put(DBOpenHelper.NOTE_TEXT, newText);
-        getContentResolver().update(NotesProvider.CONTENT_URI, values, this.noteFilter, null );
+        values.put(Note.NOTE_TEXT, newText);
+        Uri uri = Uri.parse(NotesProvider.CONTENT_URI.toString() + "/" + noteId);
+        getContentResolver().update(uri, values, this.noteFilter, null );
         Toast.makeText(this,getString(R.string.note_updated), Toast.LENGTH_SHORT).show();
         setResult(RESULT_OK);
     }
 
     private void deleteNote() {
-        getContentResolver().delete(NotesProvider.CONTENT_URI, this.noteFilter, null);
+        Uri uri = Uri.parse(NotesProvider.CONTENT_URI.toString() + "/" + noteId);
+        getContentResolver().delete(uri, this.noteFilter, null);
         Toast.makeText(this, getString(R.string.note_deleted), Toast.LENGTH_SHORT).show();
         setResult(RESULT_OK);
     }
@@ -98,7 +102,7 @@ public class EditActivity extends AppCompatActivity {
          * @return returns the URI for the new note
          */
          ContentValues values = new ContentValues();
-         values.put(DBOpenHelper.NOTE_TEXT, newText);
+         values.put(Note.NOTE_TEXT, newText);
          Uri result = getContentResolver().insert(NotesProvider.CONTENT_URI,
                   values);
          if (result != null) {
