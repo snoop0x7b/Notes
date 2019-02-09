@@ -2,6 +2,7 @@ package com.zach.notes.activities;
 
 import android.app.AlertDialog;
 import android.content.ContentValues;
+import android.content.Intent;
 import android.support.v4.content.CursorLoader;
 import android.content.DialogInterface;
 import android.support.v4.content.Loader;
@@ -16,6 +17,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.support.v4.widget.CursorAdapter;
+import android.view.View;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -28,6 +30,7 @@ import com.zach.notes.model.NotesProvider;
 public class MainActivity extends AppCompatActivity implements
         LoaderManager.LoaderCallbacks<Cursor> {
 
+    private static final int EDITOR_REQUEST_CODE = 1001;
     private CursorAdapter cursorAdapter;
 
     @Override
@@ -137,5 +140,10 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onLoaderReset(@NonNull Loader<Cursor> loader) {
         cursorAdapter.swapCursor(null); // blank it out.
+    }
+
+    public void openEditorNewNote(View view) {
+        Intent intent = new Intent(this, EditActivity.class);
+        startActivityForResult(intent, EDITOR_REQUEST_CODE);
     }
 }
