@@ -1,1 +1,1 @@
-# A simple notes app created based on a Lynda example with minor revisions
+# A simple android notes app created based on a Lynda example with minor revisions
